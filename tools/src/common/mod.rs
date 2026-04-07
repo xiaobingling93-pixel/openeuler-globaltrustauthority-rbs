@@ -10,11 +10,5 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! RBS admin tool
-
-pub mod cert;
-pub mod policy;
-pub mod ref_value;
-pub mod res;
-pub mod res_policy;
-pub mod user;
+pub mod formatter;
+pub mod validate;
