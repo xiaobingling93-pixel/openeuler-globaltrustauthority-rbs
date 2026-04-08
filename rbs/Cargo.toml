@@ -14,11 +14,29 @@ name = "rbs"
 path = "src/bin/main.rs"
 
 [features]
-default = []
-rest = ["dep:rbs-rest"]
+default = ["rest"]
+# "rbs-rest" (without dep: prefix) activates the optional rbs-rest in both
+# [dependencies] and [build-dependencies].  "dep:utoipa" activates only the
+# build-dep utoipa (which has no [dependencies] counterpart in this crate).
+rest = ["rbs-rest", "dep:utoipa"]
 lib = []
 
 [dependencies]
 rbs-api-types = { path = "api-types" }
 rbs-core = { path = "core" }
 rbs-rest = { path = "rest", optional = true }
+tokio.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+serde_yaml.workspace = true
+log.workspace = true
+
+[build-dependencies]
+rbs-rest = { path = "rest", optional = true }
+utoipa = { workspace = true, optional = true }
+# serde_yaml is lightweight; keep unconditional (also present in [dependencies]).
+serde_yaml.workspace = true
+anyhow.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

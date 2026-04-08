@@ -14,7 +14,7 @@ name = "rbc"
 path = "src/bin/main.rs"
 
 [dependencies]
-# Aligned with RBS protocol; Request/Response shared with rbs-api-types (design 10.5, rbc_interface)
+# Aligned with RBS protocol; Request/Response shared with rbs-api-types (rbc_interface)
 rbs-api-types = { path = "../rbs/api-types" }
 # tokio not needed for now; RBC is currently synchronous
 # tokio.workspace = true

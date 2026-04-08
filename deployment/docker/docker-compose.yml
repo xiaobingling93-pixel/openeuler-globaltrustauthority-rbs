@@ -5,7 +5,7 @@ services:
     build:
       context: ../..
       dockerfile: deployment/docker/dockerfile
-    image: gta-rbs/rbs:latest
+    image: globaltrustauthority-rbs/rbs:latest
     container_name: rbs
     ports:
       - "8080:8080"

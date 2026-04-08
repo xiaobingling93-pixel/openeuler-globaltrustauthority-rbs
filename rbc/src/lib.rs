@@ -13,11 +13,10 @@
 //! Resource Broker Client (RBC) Library
 //!
 
-
 pub mod client;
 pub mod evidence;
-pub mod token;
 pub mod sdk;
+pub mod token;
 
 // Re-export here when implemented so users can: use rbc::rbcClient; use rbc::EvidenceProvider;
 // pub use sdk::rbcClient;

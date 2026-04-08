@@ -6,13 +6,22 @@ authors.workspace = true
 license.workspace = true
 description = "RBS RESTful HTTP service"
 
+[features]
+# Compile rate-limit code and tests by default; runtime still off until `rest.rate_limit.enabled` in config.
+default = ["per-ip-rate-limit"]
+per-ip-rate-limit = ["dep:governor"]
+
 [dependencies]
 rbs-api-types = { path = "../api-types" }
 rbs-core = { path = "../core" }
-axum = { version = "0.7", features = ["json", "macros"] }
+actix-web = { version = "4", features = ["openssl"] }
+actix-rt = "2"
+openssl = "0.10"
+socket2 = "0.5"
+log.workspace = true
 tokio.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-tracing.workspace = true
-tower-http = { version = "0.5", features = ["trace"] }
 anyhow.workspace = true
+governor = { version = "0.6", optional = true }
+utoipa.workspace = true

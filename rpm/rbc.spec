@@ -42,5 +42,5 @@ install -D -m 644 rbc/conf/rbc.yaml %{buildroot}%{_sysconfdir}/rbc/rbc.yaml
 %config(noreplace) %{_sysconfdir}/rbc/rbc.yaml
 
 %changelog
-* Mon Feb 24 2026 globaltrustauthority-rbs Team <team@gta-rbs.org> - 0.1.0-1
+* Mon Feb 24 2026 globaltrustauthority-rbs Team - 0.1.0-1
 - Initial release of RBC

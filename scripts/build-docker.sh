@@ -9,7 +9,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 VERSION=${VERSION:-latest}
-REGISTRY=${REGISTRY:-gta-rbs}
+REGISTRY=${REGISTRY:-globaltrustauthority-rbs}
 
 echo "Building RBS Docker image for version $VERSION..."
 

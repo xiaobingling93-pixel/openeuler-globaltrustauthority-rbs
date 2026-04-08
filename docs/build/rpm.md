@@ -311,6 +311,35 @@ cargo --version
 rustc --version
 ```
 
+#### Documentation build dependencies (optional)
+
+Building RPM packages **does not** require Node.js or npm. The `./scripts/build-rpm.sh` flow uses only Cargo and `rpmbuild`.
+
+Install the following **only when** you need to **regenerate** committed API documentation (`docs/proto/rbs_rest_api.yaml`, `docs/api/rbs/md/rbs_rest_api.md`, `docs/api/rbs/html/rbs_rest_api.html`) from the same sources as the running service:
+
+| Requirement | Purpose |
+|-------------|---------|
+| **Node.js** (LTS recommended, e.g. 20+) | Runs Widdershins and Redocly via npm |
+| **npm** | Installs dev dependencies from `scripts/conf/openapi-docs/package.json` and runs `npm run api:docs` |
+
+**On OpenEuler** (package names may vary by release):
+
+```bash
+sudo dnf install -y nodejs npm
+# or: sudo yum install -y nodejs npm
+```
+
+Verify:
+
+```bash
+node --version
+npm --version
+```
+
+**One-time setup:** from the repository root, run `./scripts/generate-api-docs.sh`. It installs npm dependencies under `scripts/conf/openapi-docs/` when needed, then generates Markdown and HTML.
+
+The script runs `cargo build -p rbs` (emit OpenAPI YAML) and `npm run api:docs` (Markdown + HTML). Commit updated files under `docs/` when you change routes or OpenAPI metadata.
+
 ### Quick Build
 
 The simplest way to build all RPM packages:
@@ -585,10 +614,10 @@ The RPM spec files are located in the `rpm/` directory:
 
 ## Additional Resources
 
-- **Project Repository**: See the repository root (e.g. https://gitcode.net/gta-rbs/gta-rbs or current project URL) for source and issue tracker.
-- **RPM Packaging Guide**: https://rpm-packaging-guide.github.io/
+- **Project Repository**: [globaltrustauthority-rbs](https://gitcode.com/openeuler/globaltrustauthority-rbs) on GitCode (openEuler organization).
+- **RPM packaging (openEuler)**: [Building an RPM Package](https://docs.openeuler.org/en/docs/24.03_LTS/docs/ApplicationDev/building-an-rpm-package.html) — openEuler 24.03 LTS documentation.
 - **Rust Cargo Documentation**: https://doc.rust-lang.org/cargo/
-- **Systemd Service Documentation**: https://www.freedesktop.org/software/systemd/man/systemd.service.html
+- **systemd / `.service` units (openEuler)**: [Service Management](https://docs.openeuler.org/en/docs/24.03_LTS/docs/Administration/service-management.html) in the openEuler 24.03 LTS documentation (systemd units, `systemctl`, and unit file layout).
 - **OpenEuler Documentation**: https://docs.openeuler.org/
 
 ## Getting Help
@@ -599,15 +628,10 @@ For issues, questions, or contributions:
 - **Documentation**: Check the project documentation
 - **Community**: Participate in project discussions
 
-## Version History
+## Document status
 
-- **0.1.0**: Initial RPM package release
-  - Support for OpenEuler
-  - Basic service management
-  - Client and CLI tools
-- **Doc 1.0 (2026-03-09)**: Documentation review — corrected install script reference, added rbc config to package overview, clarified intro and uninstall backup note.
+This page is a **draft**. RPM packaging scope, procedures, and a formal version history are not finalized; treat all sections as work in progress until an explicit release is documented here.
 
 ---
 
-**Last Updated**: 2026-03-09  
-**Document Version**: 1.0
+**Status**: Draft (no formal document version or changelog yet)
