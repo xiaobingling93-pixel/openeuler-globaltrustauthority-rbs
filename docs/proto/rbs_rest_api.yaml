@@ -1,0 +1,82 @@
+openapi: 3.1.0
+info:
+  title: RBS REST API
+  description: Resource Broker Service (RBS) HTTP API.
+  contact:
+    name: RBS open-source community
+    url: https://gitcode.com/openeuler/globaltrustauthority-rbs
+  license:
+    name: Mulan Permissive Software License, Version 2
+    url: http://license.coscl.org.cn/MulanPSL2
+  version: 0.1.0
+servers:
+- url: http://localhost:6666
+  description: Default local development (see `rbs.yaml` `rest.listen_addr`)
+paths:
+  /rbs/version:
+    get:
+      tags:
+      - System
+      summary: Get service name, API version, and build metadata
+      operationId: rbsVersion
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RbsVersion'
+components:
+  schemas:
+    BuildMetadata:
+      type: object
+      description: Build-time identity for the running binary.
+      required:
+      - version
+      - git_hash
+      - build_date
+      properties:
+        build_date:
+          type: string
+          description: Build timestamp (UTC), implementation-defined format.
+          example: unknown
+        git_hash:
+          type: string
+          description: Git commit hash at build time (or placeholder when unknown).
+          example: unknown
+        version:
+          type: string
+          description: Cargo package / release version (semver).
+          example: 0.1.0
+    ErrorBody:
+      type: object
+      description: Error payload for HTTP error responses (e.g. 500).
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          description: |-
+            Error string for the caller: may be a stable code, a short machine-oriented label,
+            or a concise human-readable message. Must not include stack traces or secrets.
+    RbsVersion:
+      type: object
+      description: JSON emitted by `GET /rbs/version` (`service_name`, `api_version`, structured `build`).
+      required:
+      - service_name
+      - api_version
+      - build
+      properties:
+        api_version:
+          type: string
+          description: Published API contract version string.
+          example: 0.1.0
+        build:
+          $ref: '#/components/schemas/BuildMetadata'
+        service_name:
+          type: string
+          description: Logical service display name.
+          example: globaltrustauthority-rbs
+tags:
+- name: System
+  description: '`RbsCore::system` — service identity, API/build version via `GET /rbs/version` (system metadata; no VerifiedAuth).'
