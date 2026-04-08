@@ -10,16 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! Resource Broker Client (RBC) Library
-//!
+//! HTTP JSON schemas: `tags[0]` → `openapi/<snake>/`; optional `tags[1]` → `openapi/<t0>/<t1>/`.
 
-pub mod client;
-pub mod evidence;
-pub mod sdk;
-pub mod token;
+pub mod system;
 
-// Re-export here when implemented so users can: use rbc::rbcClient; use rbc::EvidenceProvider;
-// pub use sdk::rbcClient;
-// pub use client::RbsRestClient;
-// pub use evidence::EvidenceProvider;
-// pub use token::TokenProvider;
+pub use system::{API_VERSION, BuildMetadata, ErrorBody, RbsVersion, SERVICE_NAME};

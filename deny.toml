@@ -1,0 +1,66 @@
+# cargo-deny: https://embarkstudios.github.io/cargo-deny/
+# Run: cargo deny check  (or `cargo deny-all` from [.cargo/config.toml])
+
+[graph]
+all-features = false
+
+[advisories]
+version = 2
+db-urls = ["https://github.com/RustSec/advisory-db"]
+ignore = []
+
+[licenses]
+version = 2
+confidence-threshold = 0.8
+# With `version = 2`, any license not in `allow` (or `exceptions`) is denied — including
+# copyleft (GPL/AGPL/LGPL, MPL-2.0, etc.). `allow` is permissive-only (MIT/Apache/BSD/…).
+# SPDX `BSL-1.0` = Boost Software License 1.0 (e.g. ryu is `Apache-2.0 OR BSL-1.0`).
+unused-allowed-license = "allow"
+allow = [
+    "MIT",
+    "MIT-0",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSL-1.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "CC0-1.0",
+    "Unlicense",
+    "MulanPSL-2.0",
+    "NCSA",
+    "OpenSSL",
+]
+exceptions = []
+
+[licenses.private]
+ignore = false
+registries = []
+
+[bans]
+multiple-versions = "warn"
+# Path workspace deps use implicit versions; `warn` spams every path = "..." crate.
+wildcards = "allow"
+workspace-default-features = "allow"
+external-default-features = "allow"
+allow-workspace = false
+
+# Registry allow list matches `[source.*].registry` in `.cargo/config.toml` (mirrors + crates.io).
+# `Cargo.lock` may use the official index id or a mirror id depending on tooling; all are allowed.
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+# Pre-approved URLs (e.g. future git deps) do not warn until used.
+unused-allowed-source = "allow"
+allow-registry = [
+    "https://github.com/rust-lang/crates.io-index",
+    "sparse+https://mirrors.aliyun.com/crates.io-index/",
+    "https://mirrors.ustc.edu.cn/crates.io-index",
+    "https://mirrors.sjtug.sjtu.edu.cn/git/crates.io-index/",
+    "https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git",
+    "https://code.aliyun.com/rustcc/crates.io-index.git",
+]
+allow-git = ["https://gitcode.com/openeuler/global-trust-authority"]

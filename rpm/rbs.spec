@@ -92,5 +92,5 @@ fi
 %dir %{_localstatedir}/log/rbs
 
 %changelog
-* Mon Feb 24 2026 globaltrustauthority-rbs Team <team@gta-rbs.org> - 0.1.0-1
+* Mon Feb 24 2026 globaltrustauthority-rbs Team - 0.1.0-1
 - Initial release of RBS

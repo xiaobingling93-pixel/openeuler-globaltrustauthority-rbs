@@ -38,5 +38,5 @@ install -D -m 755 target/release/rbs-cli %{buildroot}%{_bindir}/rbs-cli
 %{_bindir}/rbs-cli
 
 %changelog
-* Mon Feb 24 2026 globaltrustauthority-rbs Team <team@gta-rbs.org> - 0.1.0-1
+* Mon Feb 24 2026 globaltrustauthority-rbs Team - 0.1.0-1
 - Initial release of RBS CLI tools

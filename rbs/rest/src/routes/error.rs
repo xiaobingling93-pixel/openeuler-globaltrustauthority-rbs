@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Huawei Technologies Co., Ltd. 2026. All rights reserved.
- * Global Trust Authority is licensed under the Mulan PSL v2.
+ * Global Trust Authority Resource Broker Service is licensed under the Mulan PSL v2.
  * You can use this software according to the terms and conditions of the Mulan PSL v2.
  * You may obtain a copy of Mulan PSL v2 at:
  *     http://license.coscl.org.cn/MulanPSL2
@@ -10,16 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! Resource Broker Client (RBC) Library
-//!
+//! JSON error responses (`ErrorBody`) for framework-level HTTP errors (404, 414, 429).
 
-pub mod client;
-pub mod evidence;
-pub mod sdk;
-pub mod token;
+use actix_web::HttpResponse;
+use rbs_api_types::ErrorBody;
 
-// Re-export here when implemented so users can: use rbc::rbcClient; use rbc::EvidenceProvider;
-// pub use sdk::rbcClient;
-// pub use client::RbsRestClient;
-// pub use evidence::EvidenceProvider;
-// pub use token::TokenProvider;
+/// No matching route under `/rbs` or `/rbs/v0`.
+pub async fn not_found() -> HttpResponse {
+    HttpResponse::NotFound().json(ErrorBody {
+        error: "Not Found".to_string(),
+    })
+}

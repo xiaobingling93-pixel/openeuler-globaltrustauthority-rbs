@@ -10,4 +10,4 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! RBS admin client — placeholder. See design §10.6.
+//! RBS admin client — placeholder.

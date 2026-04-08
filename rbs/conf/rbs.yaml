@@ -1,85 +1,127 @@
 # RBS Configuration File
-# Resource Broker Service — runtime configuration
-# Format and field descriptions: docs/design/rbs_config.md
+# Global Trust Authority (GTA) Resource Broker Service — runtime configuration
 # Override path via -c/--config or env RBS_CONFIG
-
-# REST server TLS
-tls:
-  enabled: false
-  cert_file: ""
-  key_file: ""
-
-# Logging
-logging:
-  level: info
-  format: json
-
-# Optional: external call timeouts and retry
-runtime:
-  gta_timeout_secs: 30
-  storage_timeout_secs: 10
-
-# Deployment mode: background (supports both Background and Passport)
-deployment_mode: background
 
 # REST server (required when rest feature is enabled)
 rest:
-  listen_addr: "0.0.0.0:8080"
+  listen_addr: "127.0.0.1:6666"   # localhost only; use "0.0.0.0:6666" to listen on all interfaces
   workers: 4
+  body_limit_bytes: 10485760   # 10 MiB; max request body size (413 if exceeded)
+  listen_backlog: 128           # TCP accept queue size
+  request_timeout_secs: 60      # max time to read request and send response; 0 = no limit
+  shutdown_timeout_secs: 30    # graceful shutdown: wait for in-flight requests before exit
+  # When enabled: true, cert_file and key_file must be non-empty and point to valid PEM files.
+  https:
+    enabled: false
+    cert_file: ""
+    key_file: ""
+  # Per-IP rate limit (token bucket). Effective only when built with --features per-ip-rate-limit.
+  rate_limit:
+    enabled: false
+    requests_per_sec: 60   # max requests per second per client IP
+    burst: null            # bucket capacity; default = requests_per_sec when null or omitted
+  # When RBS is behind a trusted proxy, list its peer IPs here. Client IP for rate limit and audit
+  # is then taken from Forwarded / X-Forwarded-For; otherwise the direct peer is used (no spoofing).
+  trusted_proxy:
+    addrs: []   # e.g. ["127.0.0.1", "::1"] for a local reverse proxy
 
-# Attestation service (GTA and other backends)
-attestation:
-  default_as_provider: gta
-  backends:
-    gta:
-      mode: rest
-      rest:
-        base_url: "https://gta-server:8080"
-        timeout_secs: 30
-      # built-in mode example (alternative to rest):
-      # mode: built-in
-      # built-in: {}
+# Bearer auth (JWT). Default admin: name and public key (PEM); JWT verified by this key. Role is always admin.
+# New admins: registered via Admin API (POST /rbs/v0/admin/users); their public_key/jwks_uri stored in user data.
+# auth:
+#   bearer:
+#     jwt:
+#       # Default (built-in) admin name and public key. Env placeholders supported.
+#       admin_name: "administrator"
+#       public_key: "${RBS_ADMIN_PUBLIC_KEY}"
+#       # Or inline PEM using YAML literal block: |
+#       # public_key: |
+#       #   -----BEGIN PUBLIC KEY-----
+#       #   ...
+#       #   -----END PUBLIC KEY-----
 
-# Storage: users, resource policies, and default resource persistence
-storage:
-  type: sqlite
-  sqlite:
-    path: "/var/lib/rbs/rbs.db"
-# PostgreSQL example:
+# Logging (default: file + rotation for RPM install; set file_path to empty or remove to use stderr only)
+logging:
+  level: info                    # trace | debug | info | warn | error | off
+  format: text                   # text | json
+  file_path: /var/log/rbs/rbs.log
+  enable_rotation: true
+  rotation:
+    max_file_size_bytes: 10485760   # bytes before roll
+    max_files: 6
+    compression: gzip              # none | gzip
+    file_mode: 440                 # rotated file permission. Unix only
+  file_mode: 640
+
+# # Attestation service (GTA and other backends). Timeout per backend under rest.*.
+# attestation:
+#   default_as_provider: gta
+#   backends:
+#     gta:
+#       mode: rest
+#       rest:
+#         base_url: "https://gta-server:8080"
+#         timeout_secs: 30   # external call timeout for this backend
+#         retries: 3         # max retries on transient failure
+#         backoff_secs: 2    # initial backoff between retries (exponential or fixed per impl)
+#         tls_verify: true  # verify server TLS cert; set false only for dev/testing
+#         # ca_file: ""     # optional: custom CA bundle for verification (omit = system default)
+#         api_key: ""       # optional: API key / bearer secret for GTA REST; prefer "${GTA_API_KEY}" in production
+#       # built-in mode example (alternative to rest):
+#       # mode: built-in
+#       # built-in: {}
+
+# # Storage: users, resource policies, and default resource persistence.
+# #
+# # type: sqlite | memory | mysql | postgres
+# # - sqlite  — File-backed SQLite (default). Use sqlite.path (absolute path recommended in production).
+# # - memory  — SQLite in-memory only; sqlx connects with sqlite::memory: (ephemeral; dev/test).
+# # - mysql   — MySQL / MariaDB via URL; use mysql.url, pool and optional timeout_secs.
+# # - postgres — PostgreSQL via URL; use postgres.url, pool and optional timeout_secs.
+# #
+# # Network backends (mysql, postgres): timeout_secs applies to connect/query where the pool supports it.
+# # Omitted optional blocks are ignored; only the block matching `type` is read at runtime.
 # storage:
-#   type: postgres
-#   postgres:
-#     url: "${DATABASE_URL}"
-#     max_connections: 10
+#   type: sqlite
+#   sqlite:
+#     path: "/var/lib/rbs/rbs.db"
 
-# Resource backends (for multiple backends; omit when using single storage)
-# Reserved names for res_provider: admin, attestation, resource, health
-resource:
-  default_provider: local
-  backends:
-    local:
-      type: local
-    # vault:
-    #   type: vault
-    #   url: "https://vault:8200"
-    #   token: "${VAULT_TOKEN}"
-    #   mount: "secret"
-    # ca:
-    #   type: ca
-    #   url: "https://ca-server:8443"
-    #   token: "${CA_TOKEN}"
-    #   default_profile: "server"
+# # --- Examples (uncomment one; keep a single active `storage:` root in real files) ---
+# #
+# # In-memory SQLite (sqlx ::memory:), no persistence:
+# # storage:
+# #   type: memory
+# #   memory: {}
+# #
+# # PostgreSQL:
+# # storage:
+# #   type: postgres
+# #   postgres:
+# #     url: "${DATABASE_URL}"
+# #     max_connections: 10
+# #     timeout_secs: 10
+# #
+# # MySQL / MariaDB:
+# # storage:
+# #   type: mysql
+# #   mysql:
+# #     url: "mysql://user:pass@host:3306/rbs"
+# #     max_connections: 10
+# #     timeout_secs: 30
 
-# Bearer auth (JWT)
-# Default admin: system-built-in user (e.g. administrator) JWT verified by this public key, created at bootstrap.
-# New admins: registered via Admin API (POST /rbs/v0/admin/users); their public_key/jwks_uri stored in user data, not here.
-auth:
-  bearer:
-    jwt:
-      # Default (built-in) admin public key (PEM), supports env placeholder
-      public_key: "${RBS_ADMIN_PUBLIC_KEY}"
-      # Or inline PEM using YAML literal block: |
-      # public_key: |
-      #   -----BEGIN PUBLIC KEY-----
-      #   ...
-      #   -----END PUBLIC KEY-----
+# # Resource backends (for multiple backends; omit when using single storage)
+# # Reserved names for res_provider: admin, attestation, resource
+# resource:
+#   default_provider: local
+#   backends:
+#     local:
+#       type: local
+#     # vault:
+#     #   type: vault
+#     #   url: "https://vault:8200"
+#     #   token: "${VAULT_TOKEN}"
+#     #   mount: "secret"
+#     # ca:
+#     #   type: ca
+#     #   url: "https://ca-server:8443"
+#     #   token: "${CA_TOKEN}"
+#     #   default_profile: "server"

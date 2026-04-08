@@ -133,3 +133,6 @@ fmt-all = "fmt --all"
 
 # Clippy for all workspace members
 clippy-all = "clippy --workspace --all-targets -- -D warnings"
+
+# cargo-deny: advisories, licenses, bans, sources — see `deny.toml` (requires `cargo install cargo-deny`)
+deny-all = "deny check"

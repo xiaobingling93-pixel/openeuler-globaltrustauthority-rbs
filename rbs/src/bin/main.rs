@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Huawei Technologies Co., Ltd. 2026. All rights reserved.
- * Global Trust Authority is licensed under the Mulan PSL v2.
+ * Global Trust Authority Resource Broker Service is licensed under the Mulan PSL v2.
  * You can use this software according to the terms and conditions of the Mulan PSL v2.
  * You may obtain a copy of Mulan PSL v2 at:
  *     http://license.coscl.org.cn/MulanPSL2
@@ -10,8 +10,50 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! RBS binary - placeholder.
+//! RBS binary: load config, init logging (infra), then run REST server.
 
-fn main() {
-    println!("RBS (Resource Broker Service) - placeholder");
+use std::path::Path;
+
+use anyhow::Context;
+use clap::Parser;
+use rbs::load_config;
+use rbs_core::init_logging;
+
+/// RBS (Resource Broker Service) binary.
+#[derive(Parser)]
+#[command(name = "rbs")]
+struct Cli {
+    /// Path to config file (default: rbs.yaml, or `RBS_CONFIG` env).
+    #[arg(short, long, env = "RBS_CONFIG", default_value = "rbs.yaml")]
+    config: String,
+}
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let cli = Cli::parse();
+    let config_path = &cli.config;
+    let config = load_config(config_path).with_context(|| format!("load config from {}", config_path))?;
+
+    init_logging(&config.logging).context("init logging")?;
+    log::info!("RBS config loaded from {}", Path::new(&config_path).display());
+
+    #[allow(unused_variables)]
+    let core = std::sync::Arc::new(rbs_core::RbsCore::new(rbs_core::CoreConfig { logging: config.logging.clone() }));
+
+    #[cfg(feature = "rest")]
+    {
+        let rest_config =
+            config.rest.clone().ok_or_else(|| anyhow::anyhow!("config.rest is required when built with `rest`"))?;
+        let server = rbs_rest::Server::new(core.clone(), rest_config.clone());
+        let bound = server.bind().await.context("bind REST server")?;
+        log::info!("RBS REST server starting on {}", rest_config.listen_addr);
+        bound.run().await.context("RBS REST server")?;
+    }
+
+    #[cfg(not(feature = "rest"))]
+    {
+        log::info!("RBS (Resource Broker Service) - rest feature disabled");
+    }
+
+    Ok(())
 }

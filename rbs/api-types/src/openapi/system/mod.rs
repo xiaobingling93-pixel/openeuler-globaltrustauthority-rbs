@@ -10,16 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! Resource Broker Client (RBC) Library
-//!
+pub mod version;
 
-pub mod client;
-pub mod evidence;
-pub mod sdk;
-pub mod token;
-
-// Re-export here when implemented so users can: use rbc::rbcClient; use rbc::EvidenceProvider;
-// pub use sdk::rbcClient;
-// pub use client::RbsRestClient;
-// pub use evidence::EvidenceProvider;
-// pub use token::TokenProvider;
+pub use version::{API_VERSION, BuildMetadata, ErrorBody, RbsVersion, SERVICE_NAME};

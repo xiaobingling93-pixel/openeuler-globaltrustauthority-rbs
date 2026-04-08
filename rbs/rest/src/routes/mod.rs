@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Huawei Technologies Co., Ltd. 2026. All rights reserved.
- * Global Trust Authority is licensed under the Mulan PSL v2.
+ * Global Trust Authority Resource Broker Service is licensed under the Mulan PSL v2.
  * You can use this software according to the terms and conditions of the Mulan PSL v2.
  * You may obtain a copy of Mulan PSL v2 at:
  *     http://license.coscl.org.cn/MulanPSL2
@@ -10,16 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! Resource Broker Client (RBC) Library
-//!
+//! Aggregate routes, mount under /rbs/v0.
 
-pub mod client;
-pub mod evidence;
-pub mod sdk;
-pub mod token;
+use actix_web::web;
 
-// Re-export here when implemented so users can: use rbc::rbcClient; use rbc::EvidenceProvider;
-// pub use sdk::rbcClient;
-// pub use client::RbsRestClient;
-// pub use evidence::EvidenceProvider;
-// pub use token::TokenProvider;
+pub(crate) mod error;
+pub(crate) mod version;
+
+pub use error::not_found;
+
+/// Configures routes under /rbs/v0 (scope is already /v0 when called from server).
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.default_service(web::to(not_found));
+}

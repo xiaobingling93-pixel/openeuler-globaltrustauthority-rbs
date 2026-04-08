@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Huawei Technologies Co., Ltd. 2026. All rights reserved.
- * Global Trust Authority is licensed under the Mulan PSL v2.
+ * Global Trust Authority Resource Broker Service is licensed under the Mulan PSL v2.
  * You can use this software according to the terms and conditions of the Mulan PSL v2.
  * You may obtain a copy of Mulan PSL v2 at:
  *     http://license.coscl.org.cn/MulanPSL2
@@ -12,4 +12,12 @@
 
 //! RBS REST service library.
 //!
-//! HTTP REST API implementation based on axum.
+//! HTTP REST API implementation based on actix-web.
+//! Uses the `log` crate for logging; ensure the binary has called `rbs_core::init_logging` before starting the server.
+
+mod api_doc;
+mod routes;
+mod server;
+
+pub use api_doc::ApiDoc;
+pub use server::{BoundServer, Server};

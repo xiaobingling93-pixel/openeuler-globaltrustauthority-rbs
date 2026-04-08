@@ -45,6 +45,8 @@ RUN useradd -r -s /bin/false rbs && \
 
 USER rbs
 
+ENV RBS_CONFIG=/etc/rbs/rbs.yaml
+
 EXPOSE 8080
 
 CMD ["rbs"]
