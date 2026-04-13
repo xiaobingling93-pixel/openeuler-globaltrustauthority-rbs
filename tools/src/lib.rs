@@ -15,7 +15,13 @@
 //! Depends on `rbc` for RBS client operations.
 
 pub mod admin;
+pub mod cli;
 pub mod client;
+pub mod common;
+pub mod config;
+pub mod error;
+pub mod token;
+pub mod version;
 
 /// Re-export rbc for use by CLI (auth, attest, resource ops, etc.)
 pub use rbc;

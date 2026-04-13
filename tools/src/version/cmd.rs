@@ -10,11 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! RBS admin tool
+use clap::Args;
 
-pub mod cert;
-pub mod policy;
-pub mod ref_value;
-pub mod res;
-pub mod res_policy;
-pub mod user;
+use crate::common::formatter::{Formatter, TextOutput};
+use crate::config::GlobalOptions;
+use crate::error::Result;
+
+#[derive(Args, Debug, Clone, Default)]
+pub struct VersionCli {}
+
+pub fn run(_cli: &VersionCli, _global: &GlobalOptions) -> Result<Box<dyn Formatter>> {
+    Ok(Box::new(TextOutput::new(format!("rbs-cli {}", env!("CARGO_PKG_VERSION")))))
+}

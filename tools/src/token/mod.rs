@@ -9,12 +9,24 @@
  * PURPOSE.
  * See the Mulan PSL v2 for more details.
  */
+use serde::Serialize;
 
-//! RBS admin tool
+use crate::common::formatter::Formatter;
+use crate::error::CliError;
 
-pub mod cert;
-pub mod policy;
-pub mod ref_value;
-pub mod res;
-pub mod res_policy;
-pub mod user;
+pub mod cmd;
+
+#[derive(Serialize, Debug)]
+pub(crate) struct Token {
+    pub(crate) token: String,
+}
+
+impl Formatter for Token {
+    fn render_text(&self) -> Result<String, CliError> {
+        Ok(self.token.clone())
+    }
+
+    fn render_json(&self) -> Result<String, CliError> {
+        serde_json::to_string_pretty(self).map_err(|_| CliError::InternalFormat)
+    }
+}
