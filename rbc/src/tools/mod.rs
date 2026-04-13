@@ -10,12 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Initialize logging
-    tracing_subscriber::fmt::init();
+//! Utility modules for RBC.
 
-    println!("RBC (Resource Broker Client) starting...");
-    // TODO: implement RBC main logic
-
-    Ok(())
-}
+pub mod tee_key;
