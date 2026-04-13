@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Huawei Technologies Co., Ltd. 2026. All rights reserved.
- * Global Trust Authority is licensed under the Mulan PSL v2.
+ * Global Trust Authority Resource Broker Service is licensed under the Mulan PSL v2.
  * You can use this software according to the terms and conditions of the Mulan PSL v2.
  * You may obtain a copy of Mulan PSL v2 at:
  *     http://license.coscl.org.cn/MulanPSL2
@@ -10,5 +10,23 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! Token Provider trait and implementations (RbsAttestTokenProvider, CachedTokenProvider, etc.)
-//! TODO: Implement TokenProvider trait and concrete implementations.
+//! Token Provider trait and implementations.
+
+mod native_token;
+mod rbs_token;
+
+pub use native_token::NativeTokenProvider;
+pub use rbs_token::RbsAttestTokenProvider;
+
+use crate::error::RbcError;
+use rbs_api_types::api::AttesterData;
+use serde_json::Value;
+
+/// Token acquisition trait.
+pub trait TokenProvider: Send + Sync {
+    fn get_token(
+        &self,
+        evidence: Option<&Value>,
+        attester_data: Option<&AttesterData>,
+    ) -> Result<String, RbcError>;
+}
