@@ -16,7 +16,7 @@ use std::sync::Arc;
 use serde::Deserialize;
 use serde_json::Value;
 use base64::Engine;
-use rbs_api_types::api::{AttestResponse, AttesterData, AuthChallengeResponse,
+use rbs_api_types::{AttestResponse, AttesterData, AuthChallengeResponse,
                           ResourceContentResponse, AttestRequest, RbcEvidencesPayload};
 
 use crate::client::{RbsRestClient, TlsConfig};
@@ -321,7 +321,7 @@ mod tests {
     use super::*;
     use crate::client::RbsRestClient;
     use crate::tools::tee_key::TeePublicKey;
-    use rbs_api_types::api::{AttesterData, AuthChallengeResponse};
+    use rbs_api_types::{AttesterData, AuthChallengeResponse};
     use serde_json::json;
 
     struct MockEvidenceProvider {

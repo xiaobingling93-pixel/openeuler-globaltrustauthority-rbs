@@ -13,7 +13,7 @@
 //! Native token provider: performs a full attestation flow locally via the attestation_client crate (UC-02).
 
 use attestation_client::{AttestationClient, TokenRequest};
-use rbs_api_types::api::AttesterData;
+use rbs_api_types::AttesterData;
 use serde::Deserialize;
 use serde_json::Value;
 

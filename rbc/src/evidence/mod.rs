@@ -17,7 +17,7 @@ mod native_evidence;
 pub use native_evidence::NativeEvidenceProvider;
 
 use crate::error::RbcError;
-use rbs_api_types::api::{AttesterData, AuthChallengeResponse};
+use rbs_api_types::{AttesterData, AuthChallengeResponse};
 use serde_json::Value;
 
 /// Evidence collection trait.

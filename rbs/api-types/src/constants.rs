@@ -10,23 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! Token Provider trait and implementations.
+//! RBS API constants.
 
-mod native_token;
-mod rbs_token;
+/// API prefix for all versioned endpoints.
+pub const API_PREFIX: &str = "/rbs/v0";
 
-pub use native_token::NativeTokenProvider;
-pub use rbs_token::RbsAttestTokenProvider;
+/// Supported resource types.
+pub const RESOURCE_TYPES: [&str; 3] = ["key", "secret", "cert"];
 
-use crate::error::RbcError;
-use rbs_api_types::AttesterData;
-use serde_json::Value;
+/// Service name for RBS.
+pub const SERVICE_NAME: &str = "rbs";
 
-/// Token acquisition trait.
-pub trait TokenProvider: Send + Sync {
-    fn get_token(
-        &self,
-        evidence: Option<&Value>,
-        attester_data: Option<&AttesterData>,
-    ) -> Result<String, RbcError>;
-}
+/// API version string.
+pub const API_VERSION: &str = "0.1.0";
+
+/// Placeholder for git hash when not available at build time.
+pub const GIT_HASH_PLACEHOLDER: &str = "unknown";
+
+/// Placeholder for build date when not available at build time.
+pub const BUILD_DATE_PLACEHOLDER: &str = "unknown";

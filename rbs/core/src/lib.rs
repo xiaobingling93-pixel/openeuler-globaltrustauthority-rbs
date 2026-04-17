@@ -43,7 +43,7 @@ impl RbsCore {
     }
 }
 
-/// System-scoped operations (version, health, etc.).
+/// System-scoped operations (version, etc.).
 #[derive(Debug, Clone, Copy, Default)]
 pub struct System;
 
