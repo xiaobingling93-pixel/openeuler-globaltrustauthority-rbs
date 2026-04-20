@@ -40,6 +40,13 @@ install -D -m 755 target/release/rbs %{buildroot}%{_bindir}/rbs
 
 # Install configuration files
 install -D -m 644 rbs/conf/rbs.yaml %{buildroot}%{_sysconfdir}/rbs/rbs.yaml
+# SQLite bootstrap SQL (must match storage.sql_file_path after sed below)
+install -D -m 644 rbs/conf/sqlite_rbs.sql %{buildroot}%{_datadir}/rbs/sqlite_rbs.sql
+# Packaged defaults: use /var/lib/rbs for DB and /usr/share for schema (rbs user cannot write /root)
+sed -i \
+    -e 's|^  url: "sqlite:///root/rbs.db"$|  url: "sqlite:///var/lib/rbs/rbs.db"|' \
+    -e 's|^  sql_file_path: "rbs/conf/sqlite_rbs.sql"$|  sql_file_path: "/usr/share/rbs/sqlite_rbs.sql"|' \
+    %{buildroot}%{_sysconfdir}/rbs/rbs.yaml
 
 # Install systemd service file
 install -D -m 644 service/rbs.service %{buildroot}/usr/lib/systemd/system/rbs.service
@@ -87,10 +94,11 @@ fi
 %defattr(-,root,root,-)
 %{_bindir}/rbs
 %config(noreplace) %{_sysconfdir}/rbs/rbs.yaml
+%{_datadir}/rbs/sqlite_rbs.sql
 /usr/lib/systemd/system/rbs.service
 %dir %{_localstatedir}/lib/rbs
 %dir %{_localstatedir}/log/rbs
 
 %changelog
 * Mon Feb 24 2026 globaltrustauthority-rbs Team - 0.1.0-1
-- Initial release of RBS
+- Initial release of RBS (binary, systemd, dirs; ship sqlite_rbs.sql under /usr/share/rbs and patch packaged storage paths in /etc/rbs/rbs.yaml)

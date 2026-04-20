@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MulanPSL-2.0
+#
 # Run all tests: Cargo workspace unit/integration tests, then e2e/interface scripts.
 # Can be invoked from anywhere; the script cd's to the repo root.
 #
@@ -19,6 +21,7 @@
 # Environment toggles (default: all enabled):
 #   ENABLE_CARGO_TESTS=0 ./tests/test_all.sh   # skip Cargo tests
 #   ENABLE_E2E_TESTS=0   ./tests/test_all.sh   # skip e2e/interface tests
+#   ENABLE_SCRIPT_SMOKE_TESTS=0 ./tests/test_all.sh   # skip bash -n + scripts --help smoke
 #
 # After workspace Cargo tests or `--suite rbs` Cargo tests, verifies
 # docs/proto/rbs_rest_api.yaml matches `cargo build -p rbs --features rest` (committed tree vs build output).
@@ -62,6 +65,7 @@ Examples:
 Environment variables (defaults shown):
   ENABLE_CARGO_TESTS=\${ENABLE_CARGO_TESTS:-1}
   ENABLE_E2E_TESTS=\${ENABLE_E2E_TESTS:-1}
+  ENABLE_SCRIPT_SMOKE_TESTS=\${ENABLE_SCRIPT_SMOKE_TESTS:-1}
 EOF
 }
 
@@ -154,6 +158,16 @@ main() {
   if [[ "${#testcase_flags[@]}" -gt 0 && "${#suites[@]}" -eq 0 ]]; then
     echo "test_all.sh: --testcase requires at least one --suite" >&2
     exit 1
+  fi
+
+  ENABLE_SCRIPT_SMOKE_TESTS="${ENABLE_SCRIPT_SMOKE_TESTS:-1}"
+  if [[ "$ENABLE_SCRIPT_SMOKE_TESTS" == "1" ]]; then
+    echo "=== Shell scripts smoke (bash -n, --help) ==="
+    bash "$REPO_ROOT/tests/scripts_smoke.sh"
+    echo ""
+  else
+    echo "=== Shell scripts smoke SKIPPED (ENABLE_SCRIPT_SMOKE_TESTS=$ENABLE_SCRIPT_SMOKE_TESTS) ==="
+    echo ""
   fi
 
   if [[ "$ENABLE_CARGO_TESTS" != "1" && "$ENABLE_E2E_TESTS" != "1" ]]; then

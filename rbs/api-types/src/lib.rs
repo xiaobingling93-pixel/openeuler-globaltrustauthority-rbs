@@ -18,7 +18,7 @@
 //! types. The checked-in [`docs/proto/rbs_rest_api.yaml`](../../../docs/proto/rbs_rest_api.yaml) is emitted when
 //! building the `rbs` crate (`rbs/build.rs`) from the workspace root.
 //!
-//! **Module layout:** map OpenAPI tag names to `openapi/<snake_case>/` and nest files for related
+//! **Module layout:** map `OpenAPI` tag names to `openapi/<snake_case>/` and nest files for related
 //! schemas (e.g. System-tagged version metadata → `openapi/system/version.rs`). Crate root
 //! re-exports schema types for convenience.
 
@@ -27,5 +27,5 @@ pub mod openapi;
 
 pub use openapi::*;
 
-pub mod config;
 pub mod api;
+pub mod config;

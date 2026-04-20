@@ -1,6 +1,6 @@
 # RBS (Resource Broker Service) Dockerfile
-FROM rust:1.75 as builder
-
+# Builder needs Cargo that understands workspace Cargo.lock (version 4); rust:1.75 is too old.
+FROM rust:1.85-bookworm AS builder
 WORKDIR /build
 
 # Copy workspace config

@@ -6,7 +6,8 @@ E2e and interface tests for the workspace: **RBS** server, **RBC** client, and *
 
 ```
 tests/
-├── test_all.sh         # Run all: Cargo tests + e2e (from workspace root)
+├── test_all.sh         # Run all: shell smoke + Cargo tests + e2e (from workspace root)
+├── scripts_smoke.sh    # bash -n + scripts --help (invoked by test_all.sh)
 ├── run_e2e.sh          # Run e2e only (from workspace root)
 ├── README.md           # This file
 ├── rbs/                # RBS server e2e (REST API, curl, etc.)
@@ -43,6 +44,12 @@ ENABLE_E2E_TESTS=0 ./tests/test_all.sh
 
 ```bash
 ENABLE_CARGO_TESTS=0 ./tests/test_all.sh
+```
+
+- Skip **shell script smoke** (`bash -n` on helper scripts + `help` / `--help`):
+
+```bash
+ENABLE_SCRIPT_SMOKE_TESTS=0 ./tests/test_all.sh
 ```
 
 - Equivalent CLI flags (CLI takes precedence over env):

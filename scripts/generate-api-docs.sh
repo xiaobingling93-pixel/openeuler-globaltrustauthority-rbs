@@ -1,17 +1,155 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MulanPSL-2.0
+#
 # Generate API documentation: OpenAPI YAML (Cargo), then Markdown and HTML (npm).
 #
 # In CI (CI=true) the script also verifies that the committed docs/api/rbs/ tree is
 # up-to-date and exits non-zero when there is a drift.
+#
+# On Ubuntu/Debian or openEuler (and common derivatives), if npm is missing, attempts a
+# non-interactive package install (apt or dnf). Auto-install is skipped when CI=true or
+# DISABLE_AUTO_INSTALL_DEPS=1.
+#
+# Environment:
+#   SKIP_LICENSE_CHECK=1  Skip npm license-checker before api:md/api:html (faster local runs).
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+# shellcheck source=lib/os-pkg.sh
+source "$SCRIPT_DIR/lib/os-pkg.sh"
+
 cd "$ROOT"
+
+# Minimum Node.js release — must stay in sync with scripts/conf/openapi-docs/package.json "engines.node".
+# Repository root .nvmrc pins the recommended line for local development.
+readonly NODE_VERSION_MIN="22.12.0"
+
+usage() {
+    cat <<'EOF'
+Usage: scripts/generate-api-docs.sh [help | -h | --help]
+
+  Regenerates docs/proto/rbs_rest_api.yaml via Cargo, then Markdown/HTML under docs/api/rbs/.
+  In a git worktree, compares generated paths to the index; CI=true fails on drift, otherwise notice.
+
+  SKIP_LICENSE_CHECK=1  Skip license-checker before generating MD/HTML (local iteration).
+  DISABLE_AUTO_INSTALL_DEPS=1  Do not sudo-install missing npm (same effect as CI for OS packages).
+
+  Node.js must satisfy package.json engines (see NODE_VERSION_MIN in this script; currently >= 22.12.0).
+EOF
+}
+
+if [[ "${1:-}" == "-h" ]] || [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "help" ]]; then
+    usage
+    exit 0
+fi
+
+check_node_minimum() {
+    local ver low
+    if ! command -v node >/dev/null 2>&1; then
+        echo "error: node is not on PATH after npm install." >&2
+        exit 1
+    fi
+    ver="$(node -p "process.versions.node" 2>/dev/null || echo "")"
+    if [[ -z "$ver" ]]; then
+        echo "error: could not read Node.js version from node." >&2
+        exit 1
+    fi
+    # Lexicographic version sort (-V): lowest of (min, actual) must be min iff actual >= min.
+    low="$(printf '%s\n' "$NODE_VERSION_MIN" "$ver" | sort -V | head -n1)"
+    if [[ "$low" != "$NODE_VERSION_MIN" ]]; then
+        echo "error: Node.js >= ${NODE_VERSION_MIN} required for OpenAPI doc tooling (found ${ver}; see scripts/conf/openapi-docs/package.json engines)." >&2
+        echo "Install a newer Node (nvm per .nvmrc, NodeSource, or distro packages), then re-run." >&2
+        exit 1
+    fi
+}
+
+ensure_npm() {
+    if command -v npm >/dev/null 2>&1; then
+        check_node_minimum
+        return 0
+    fi
+
+    if build_deps_auto_install_disabled; then
+        echo "error: npm is required; install Node.js/npm (auto-install disabled when CI=true or DISABLE_AUTO_INSTALL_DEPS=1)." >&2
+        exit 1
+    fi
+
+    local family
+    family="$(detect_pkg_family)"
+    echo "notice: npm not found; attempting install (pkg_family=${family}) ..." >&2
+
+    case "$family" in
+        apt)
+            if ! command -v apt-get >/dev/null 2>&1; then
+                echo "error: apt-get not found; install nodejs and npm manually." >&2
+                exit 1
+            fi
+            run_priv apt-get update -qq
+            run_priv env DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs npm
+            ;;
+        dnf)
+            if command -v dnf >/dev/null 2>&1; then
+                run_priv dnf install -y nodejs npm
+            elif command -v yum >/dev/null 2>&1; then
+                run_priv yum install -y nodejs npm
+            else
+                echo "error: neither dnf nor yum found; install nodejs and npm manually." >&2
+                exit 1
+            fi
+            ;;
+        *)
+            echo "error: unsupported distro for automatic npm install (pkg_family=${family})." >&2
+            echo "Install Node.js and npm, or use nvm, then re-run this script." >&2
+            exit 1
+            ;;
+    esac
+
+    if ! command -v npm >/dev/null 2>&1; then
+        echo "error: npm is still not on PATH after package install." >&2
+        exit 1
+    fi
+    check_node_minimum
+}
+
+in_git_worktree() {
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1
+}
+
+git_diff_quiet_or_skip() {
+    local path="$1"
+    if ! in_git_worktree; then
+        echo "notice: not a git worktree; skipping drift check for ${path}." >&2
+        return 0
+    fi
+    git diff --quiet -- "$path"
+}
+
+npm_ci_or_exit() {
+    local dir="$1"
+    if ! npm ci --prefix "$dir"; then
+        echo "error: npm ci failed under ${dir}." >&2
+        echo "hint: run from repository root; ensure package-lock.json matches package.json (regenerate lock if needed)." >&2
+        exit 1
+    fi
+}
+
+run_api_docs() {
+    local dir="$1"
+    if [[ "${SKIP_LICENSE_CHECK:-}" == "1" ]]; then
+        npm --prefix "$dir" run api:docs:gen
+    else
+        npm --prefix "$dir" run api:docs
+    fi
+}
+
+# Fail fast if Node tooling is missing before a long Cargo build.
+ensure_npm
 
 cargo build -p rbs --features rest
 
 # OpenAPI YAML is emitted by rbs/build.rs; ensure the checked-in file matches the build.
-if ! git diff --quiet -- docs/proto/rbs_rest_api.yaml; then
+if ! git_diff_quiet_or_skip docs/proto/rbs_rest_api.yaml; then
     if [[ "${CI:-}" == "true" ]]; then
         echo "error: docs/proto/rbs_rest_api.yaml differs from build output; rebuild and commit." >&2
         exit 1
@@ -20,22 +158,22 @@ if ! git diff --quiet -- docs/proto/rbs_rest_api.yaml; then
     fi
 fi
 
-if ! command -v npm >/dev/null 2>&1; then
-    echo "error: npm is required to generate docs/api/rbs/md/rbs_rest_api.md and docs/api/rbs/html/rbs_rest_api.html (install Node.js or use nvm)." >&2
-    exit 1
-fi
-
+# --- OpenAPI → Markdown / HTML (Node; see scripts/conf/openapi-docs/package.json) ---
+# Input:  docs/proto/rbs_rest_api.yaml (from cargo build above via rbs/build.rs).
+# Output: docs/api/rbs/md/rbs_rest_api.md   — Widdershins (api:md), OpenAPI → Markdown, --omitHeader.
+#         docs/api/rbs/html/rbs_rest_api.html — Redocly build-docs (api:html).
+# api:docs runs license:check, then api:docs:gen (api:md + api:html). SKIP_LICENSE_CHECK=1 runs api:docs:gen only.
 mkdir -p docs/api/rbs/md docs/api/rbs/html
 
 NPM_DIR="$ROOT/scripts/conf/openapi-docs"
 if [[ "${CI:-}" == "true" ]] || [[ ! -d "$NPM_DIR/node_modules" ]]; then
-    npm ci --prefix "$NPM_DIR"
+    npm_ci_or_exit "$NPM_DIR"
 fi
 
-npm --prefix "$NPM_DIR" run api:docs
+run_api_docs "$NPM_DIR"
 
 # Drift detection: warn locally; fail in CI so stale docs are caught before merge.
-if ! git diff --quiet -- docs/api/rbs/; then
+if ! git_diff_quiet_or_skip docs/api/rbs/; then
     if [[ "${CI:-}" == "true" ]]; then
         echo "error: docs/api/rbs/ differs from committed files; regenerate and commit the updated docs." >&2
         exit 1

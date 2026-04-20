@@ -20,7 +20,7 @@ pub struct AuthChallengeResponse {
     pub nonce: String,
 }
 
-/// Optional attester metadata (`AttesterData` in OpenAPI).
+/// Optional attester metadata (`AttesterData` in `OpenAPI`).
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AttesterData {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,7 +54,7 @@ pub struct RbcMeasurement {
     pub evidences: Vec<RbcEvidenceItem>,
 }
 
-/// Evidence bundle (`RbcEvidencesPayload` in OpenAPI).
+/// Evidence bundle (`RbcEvidencesPayload` in `OpenAPI`).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RbcEvidencesPayload {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -88,5 +88,5 @@ pub struct ResourceContentResponse {
     pub content_type: Option<String>,
 }
 
-/// Same JSON object as [`AttestRequest`] (OpenAPI `ResourceRetrieveRequest`).
+/// Same JSON object as [`AttestRequest`] (`OpenAPI` `ResourceRetrieveRequest`).
 pub type ResourceRetrieveRequest = AttestRequest;
