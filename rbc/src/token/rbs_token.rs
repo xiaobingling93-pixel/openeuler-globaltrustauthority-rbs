@@ -12,7 +12,7 @@
 
 //! Token provider that submits evidence to the RBS `/attest` endpoint (UC-01).
 
-use rbs_api_types::api::{AttestRequest, AttesterData, RbcEvidencesPayload};
+use rbs_api_types::{AttestRequest, AttesterData, RbcEvidencesPayload};
 use serde::Deserialize;
 use serde_json::Value;
 

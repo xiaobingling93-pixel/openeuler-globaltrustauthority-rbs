@@ -20,6 +20,8 @@
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
+use crate::RbsError;
+
 /// Public service name for APIs, logs, and the exported `OpenAPI` document.
 pub const SERVICE_NAME: &str = "globaltrustauthority-rbs";
 
@@ -78,6 +80,33 @@ pub struct ErrorBody {
     /// Error string for the caller: may be a stable code, a short machine-oriented label,
     /// or a concise human-readable message. Must not include stack traces or secrets.
     pub error: String,
+}
+
+impl ErrorBody {
+    /// Creates a new error body with the given message.
+    pub fn new(error: impl Into<String>) -> Self {
+        Self {
+            error: error.into(),
+        }
+    }
+}
+
+impl From<&str> for ErrorBody {
+    fn from(s: &str) -> Self {
+        Self::new(s)
+    }
+}
+
+impl From<String> for ErrorBody {
+    fn from(s: String) -> Self {
+        Self::new(s)
+    }
+}
+
+impl From<&RbsError> for ErrorBody {
+    fn from(e: &RbsError) -> Self {
+        ErrorBody::new(e.external_message())
+    }
 }
 
 /// Build-time identity for the running binary.

@@ -13,7 +13,7 @@
 //! RBS REST API client and TLS configuration.
 
 use reqwest::Client as HttpClient;
-use rbs_api_types::api::{
+use rbs_api_types::{
     AttestRequest, AttestResponse, AuthChallengeResponse, ResourceContentResponse,
 };
 

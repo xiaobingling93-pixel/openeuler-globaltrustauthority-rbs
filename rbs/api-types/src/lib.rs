@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Huawei Technologies Co., Ltd. 2026. All rights reserved.
- * Global Trust Authority is licensed under the Mulan PSL v2.
+ * Global Trust Authority Resource Broker Service is licensed under the Mulan PSL v2.
  * You can use this software according to the terms and conditions of the Mulan PSL v2.
  * You may obtain a copy of Mulan PSL v2 at:
  *     http://license.coscl.org.cn/MulanPSL2
@@ -12,20 +12,67 @@
 
 //! RBS API types library.
 //!
-//! Run configuration (`config`) and related types shared by REST and core.
+//! Request/response structs, error types, and constants shared by REST and built-in.
 //!
-//! `OpenAPI` `components.schemas` for HTTP JSON bodies live under [`openapi`] as [`utoipa::ToSchema`]
-//! types. The checked-in [`docs/proto/rbs_rest_api.yaml`](../../../docs/proto/rbs_rest_api.yaml) is emitted when
-//! building the `rbs` crate (`rbs/build.rs`) from the workspace root.
+//! All types in this crate are pure data definitions with no business logic.
+//! They must stay in sync with the OpenAPI specification at `rbs_api.yaml`.
 //!
-//! **Module layout:** map OpenAPI tag names to `openapi/<snake_case>/` and nest files for related
-//! schemas (e.g. System-tagged version metadata → `openapi/system/version.rs`). Crate root
-//! re-exports schema types for convenience.
+//! # Modules
+//!
+//! - [`auth`] - Attestation-related types (challenge, evidence, token)
+//! - [`constants`] - API constants (prefix, resource types)
+//! - [`error`] - Unified error types with stable error codes
+//! - [`resource`] - Resource-related types (content, metadata, upsert)
+//! - [`user`] - User management types (create, update, list)
+//!
+//! # API Contract
+//!
+//! The types in this crate are derived from the OpenAPI 3.0 specification.
+//! The authoritative source is `design_doc/design/rbs_spec/api/rbs_api.yaml`.
+//!
+//! # Architecture
+//!
+//! ```text
+//! HTTP/JSON  <--serde-->  rbs-api-types  <--->  rbs-core (business logic)
+//! ```
 
-/// HTTP JSON schema types (`OpenAPI` `components.schemas`).
-pub mod openapi;
-
-pub use openapi::*;
-
+pub mod auth;
 pub mod config;
-pub mod api;
+pub mod constants;
+pub mod error;
+pub mod openapi;
+pub mod resource;
+pub mod user;
+
+// Re-export types from auth module
+pub use auth::{
+    AttestRequest, AttestResponse, AttesterData, AuthChallengeResponse, RbcEvidenceItem,
+    RbcEvidencesPayload, RbcMeasurement,
+};
+
+// Re-export types from config module
+pub use config::{
+    CoreConfig, Database, LogRotationConfig, LoggingConfig, PerIpRateLimitConfig, RestConfig,
+    RestHttpsConfig, RbsConfig, RotationCompression, Sensitive, TrustedProxyConfig,
+};
+
+// Re-export constants from constants module
+pub use constants::{
+    API_PREFIX, API_VERSION, BUILD_DATE_PLACEHOLDER, GIT_HASH_PLACEHOLDER, RESOURCE_TYPES,
+    SERVICE_NAME,
+};
+
+// Re-export types from error module
+pub use error::RbsError;
+
+// Re-export types from resource module
+pub use resource::{
+    ResourceContentResponse, ResourceInfoResponse, ResourceMetadataResponse,
+    ResourceRetrieveRequest, ResourceUpsertRequest,
+};
+
+// Re-export types from openapi module (with ToSchema and example attributes)
+pub use openapi::{BuildMetadata, ErrorBody, RbsVersion};
+
+// Re-export types from user module
+pub use user::{UserCreateRequest, UserListResponse, UserResponse, UserUpdateRequest};

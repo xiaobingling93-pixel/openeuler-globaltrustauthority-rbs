@@ -8,7 +8,7 @@ info:
   license:
     name: Mulan Permissive Software License, Version 2
     url: http://license.coscl.org.cn/MulanPSL2
-  version: '0'
+  version: 0.1.0
 servers:
 - url: http://localhost:6666
   description: Default local development (see `rbs.yaml` `rest.listen_addr`)
@@ -32,7 +32,7 @@ components:
   schemas:
     BuildMetadata:
       type: object
-      description: Build-time identity for the running binary.
+      description: Build metadata for version information.
       required:
       - version
       - git_hash
@@ -40,30 +40,29 @@ components:
       properties:
         version:
           type: string
-          description: Cargo package / release version (semver).
-          example: 0.1.0
+          description: Package version (e.g., "0.1.0").
         git_hash:
           type: string
-          description: Git commit hash at build time (hex), or empty when not embedded at build.
-          example: ''
+          description: Git commit hash.
         build_date:
           type: string
-          description: Build timestamp (UTC), typically RFC 3339, or empty when not embedded at build.
-          example: ''
+          description: Build timestamp.
     ErrorBody:
       type: object
-      description: Error payload for HTTP error responses (e.g. 500).
+      description: |-
+        Error body returned for all error responses.
+
+        The `error` field may be a stable code (RBS-xxx), a short machine-oriented label,
+        or a concise human-readable message. Must not include stack traces or secrets.
       required:
       - error
       properties:
         error:
           type: string
-          description: |-
-            Error string for the caller: may be a stable code, a short machine-oriented label,
-            or a concise human-readable message. Must not include stack traces or secrets.
+          description: Error string for the caller.
     RbsVersion:
       type: object
-      description: JSON emitted by `GET /rbs/version` (`service_name`, `api_version`, structured `build`).
+      description: Response for GET /rbs/version.
       required:
       - service_name
       - api_version
@@ -71,14 +70,13 @@ components:
       properties:
         service_name:
           type: string
-          description: Logical service display name.
-          example: globaltrustauthority-rbs
+          description: Logical service name (e.g. rbs).
         api_version:
           type: string
-          description: Published API contract version string.
-          example: '0'
+          description: Published API / contract version string.
         build:
           $ref: '#/components/schemas/BuildMetadata'
+          description: Build or git metadata.
 tags:
 - name: System
   description: '`RbsCore::system` — service identity and API/build version via `GET /rbs/version` (system metadata). Does not require authentication.'

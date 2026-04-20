@@ -10,23 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! Token Provider trait and implementations.
+//! Integration tests for constants.
 
-mod native_token;
-mod rbs_token;
+use rbs_api_types::{constants::*, API_PREFIX, RESOURCE_TYPES};
 
-pub use native_token::NativeTokenProvider;
-pub use rbs_token::RbsAttestTokenProvider;
+#[test]
+fn test_api_prefix() {
+    assert_eq!(API_PREFIX, "/rbs/v0");
+}
 
-use crate::error::RbcError;
-use rbs_api_types::AttesterData;
-use serde_json::Value;
-
-/// Token acquisition trait.
-pub trait TokenProvider: Send + Sync {
-    fn get_token(
-        &self,
-        evidence: Option<&Value>,
-        attester_data: Option<&AttesterData>,
-    ) -> Result<String, RbcError>;
+#[test]
+fn test_resource_types() {
+    assert_eq!(RESOURCE_TYPES.len(), 3);
+    assert!(RESOURCE_TYPES.contains(&"key"));
+    assert!(RESOURCE_TYPES.contains(&"secret"));
+    assert!(RESOURCE_TYPES.contains(&"cert"));
 }

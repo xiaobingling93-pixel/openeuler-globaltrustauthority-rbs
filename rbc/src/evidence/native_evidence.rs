@@ -13,7 +13,7 @@
 //! Native evidence provider: collects evidence locally via the attestation_client crate.
 
 use attestation_client::{AttestationClient, GetEvidenceRequest};
-use rbs_api_types::api::{AttesterData, AuthChallengeResponse};
+use rbs_api_types::{AttesterData, AuthChallengeResponse};
 use serde::Deserialize;
 use serde_json::Value;
 

@@ -14,7 +14,7 @@ use rbc::client::RbsRestClient;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 use rbc::error::RbcError;
-use rbs_api_types::api::{AttestRequest, RbcEvidencesPayload};
+use rbs_api_types::{AttestRequest, RbcEvidencesPayload};
 
 #[tokio::test]
 async fn test_get_auth_returns_nonce() {
@@ -49,7 +49,7 @@ async fn test_post_attest_returns_token() {
         as_provider: None,
         rbc_evidences: RbcEvidencesPayload {
             agent_version: None,
-            measurements: None,
+            measurements: vec![],
         },
         attester_data: None,
     };
@@ -119,7 +119,7 @@ async fn test_get_resource_by_evidence_returns_content() {
         as_provider: None,
         rbc_evidences: RbcEvidencesPayload {
             agent_version: None,
-            measurements: None,
+            measurements: vec![],
         },
         attester_data: None,
     };
@@ -144,7 +144,7 @@ async fn test_get_resource_by_evidence_404_returns_resource_not_found() {
         as_provider: None,
         rbc_evidences: RbcEvidencesPayload {
             agent_version: None,
-            measurements: None,
+            measurements: vec![],
         },
         attester_data: None,
     };
