@@ -6,6 +6,7 @@ target/
 **/*.rs.bk
 # Cargo.lock should be committed (for application projects)
 # Cargo.lock
+vendor/
 
 # IDE
 .idea/
@@ -34,4 +35,3 @@ about.hbs
 about.toml
 scripts/generate_third_party_notice.sh
 scripts/html_to_notice.py
-

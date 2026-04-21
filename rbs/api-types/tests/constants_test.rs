@@ -10,14 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! RBS REST service library.
-//!
-//! HTTP REST API implementation based on actix-web.
-//! Uses the `log` crate for logging; ensure the binary has called `rbs_core::init_logging` before starting the server.
+//! Integration tests for constants.
 
-mod api_doc;
-pub mod routes;
-pub mod server;
+use rbs_api_types::{constants::*, API_PREFIX, RESOURCE_TYPES};
 
-pub use api_doc::ApiDoc;
-pub use server::{BoundServer, Server};
+#[test]
+fn test_api_prefix() {
+    assert_eq!(API_PREFIX, "/rbs/v0");
+}
+
+#[test]
+fn test_resource_types() {
+    assert_eq!(RESOURCE_TYPES.len(), 3);
+    assert!(RESOURCE_TYPES.contains(&"key"));
+    assert!(RESOURCE_TYPES.contains(&"secret"));
+    assert!(RESOURCE_TYPES.contains(&"cert"));
+}

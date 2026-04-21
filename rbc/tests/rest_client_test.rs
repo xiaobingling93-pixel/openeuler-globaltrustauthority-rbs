@@ -14,7 +14,7 @@ use rbc::client::RbsRestClient;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 use rbc::error::RbcError;
-use rbs_api_types::api::{AttestRequest, RbcEvidencesPayload};
+use rbs_api_types::{AttestRequest, RbcEvidencesPayload};
 
 #[tokio::test]
 async fn test_get_auth_returns_nonce() {
@@ -28,7 +28,7 @@ async fn test_get_auth_returns_nonce() {
         .mount(&mock_server)
         .await;
 
-    let client = RbsRestClient::new(&mock_server.uri(), None).unwrap();
+    let client = RbsRestClient::new(&mock_server.uri(), None, None).unwrap();
     let challenge = client.get_nonce(None).await.unwrap();
     assert_eq!(challenge.nonce, "test-nonce-123");
 }
@@ -44,12 +44,12 @@ async fn test_post_attest_returns_token() {
         .mount(&mock_server)
         .await;
 
-    let client = RbsRestClient::new(&mock_server.uri(), None).unwrap();
+    let client = RbsRestClient::new(&mock_server.uri(), None, None).unwrap();
     let req = AttestRequest {
         as_provider: None,
         rbc_evidences: RbcEvidencesPayload {
             agent_version: None,
-            measurements: None,
+            measurements: vec![],
         },
         attester_data: None,
     };
@@ -71,7 +71,7 @@ async fn test_get_resource_with_bearer_token() {
         .mount(&mock_server)
         .await;
 
-    let client = RbsRestClient::new(&mock_server.uri(), None).unwrap();
+    let client = RbsRestClient::new(&mock_server.uri(), None, None).unwrap();
     let resp = client
         .get_resource(uri, "bearer-token")
         .await
@@ -89,7 +89,7 @@ async fn test_http_404_returns_resource_not_found() {
         .mount(&mock_server)
         .await;
 
-    let client = RbsRestClient::new(&mock_server.uri(), None).unwrap();
+    let client = RbsRestClient::new(&mock_server.uri(), None, None).unwrap();
     let err = client
         .get_resource("missing", "token")
         .await
@@ -114,12 +114,12 @@ async fn test_get_resource_by_evidence_returns_content() {
         .mount(&mock_server)
         .await;
 
-    let client = RbsRestClient::new(&mock_server.uri(), None).unwrap();
+    let client = RbsRestClient::new(&mock_server.uri(), None, None).unwrap();
     let req = AttestRequest {
         as_provider: None,
         rbc_evidences: RbcEvidencesPayload {
             agent_version: None,
-            measurements: None,
+            measurements: vec![],
         },
         attester_data: None,
     };
@@ -139,12 +139,12 @@ async fn test_get_resource_by_evidence_404_returns_resource_not_found() {
         .mount(&mock_server)
         .await;
 
-    let client = RbsRestClient::new(&mock_server.uri(), None).unwrap();
+    let client = RbsRestClient::new(&mock_server.uri(), None, None).unwrap();
     let req = AttestRequest {
         as_provider: None,
         rbc_evidences: RbcEvidencesPayload {
             agent_version: None,
-            measurements: None,
+            measurements: vec![],
         },
         attester_data: None,
     };
@@ -167,7 +167,7 @@ async fn test_http_500_returns_server_error() {
         .mount(&mock_server)
         .await;
 
-    let client = RbsRestClient::new(&mock_server.uri(), None).unwrap();
+    let client = RbsRestClient::new(&mock_server.uri(), None, None).unwrap();
     let err = client.get_nonce(None).await.unwrap_err();
     assert!(
         matches!(err, RbcError::ServerError(_)),

@@ -10,14 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-//! RBS REST service library.
-//!
-//! HTTP REST API implementation based on actix-web.
-//! Uses the `log` crate for logging; ensure the binary has called `rbs_core::init_logging` before starting the server.
+//! RBS API constants.
 
-mod api_doc;
-pub mod routes;
-pub mod server;
+/// API prefix for all versioned endpoints.
+pub const API_PREFIX: &str = "/rbs/v0";
 
-pub use api_doc::ApiDoc;
-pub use server::{BoundServer, Server};
+/// Supported resource types.
+pub const RESOURCE_TYPES: [&str; 3] = ["key", "secret", "cert"];
+
+/// Service name for RBS.
+pub const SERVICE_NAME: &str = "rbs";
+
+/// API version string.
+pub const API_VERSION: &str = "0.1.0";
+
+/// Placeholder for git hash when not available at build time.
+pub const GIT_HASH_PLACEHOLDER: &str = "unknown";
+
+/// Placeholder for build date when not available at build time.
+pub const BUILD_DATE_PLACEHOLDER: &str = "unknown";

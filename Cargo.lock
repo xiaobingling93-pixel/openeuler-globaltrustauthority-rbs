@@ -216,7 +216,7 @@ checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 [[package]]
 name = "agent_utils"
 version = "0.1.0"
-source = "git+https://gitcode.com/openeuler/global-trust-authority#95a858d9c98821d71a8cf605542206a6be399215"
+source = "git+https://gitcode.com/openeuler/global-trust-authority#98ad90e81d64fd7c8e6a13bff3516deaeaa9c60d"
 dependencies = [
  "config",
  "log",
@@ -408,7 +408,7 @@ checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 [[package]]
 name = "attestation_client"
 version = "0.1.0"
-source = "git+https://gitcode.com/openeuler/global-trust-authority#95a858d9c98821d71a8cf605542206a6be399215"
+source = "git+https://gitcode.com/openeuler/global-trust-authority#98ad90e81d64fd7c8e6a13bff3516deaeaa9c60d"
 dependencies = [
  "agent_utils",
  "challenge",
@@ -617,6 +617,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "cbindgen"
+version = "0.29.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "befbfd072a8e81c02f8c507aefce431fe5e7d051f83d48a23ffc9b9fe5a11799"
+dependencies = [
+ "clap",
+ "heck 0.5.0",
+ "indexmap",
+ "log",
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_json",
+ "syn 2.0.117",
+ "tempfile",
+ "toml",
+]
+
+[[package]]
 name = "cc"
 version = "1.2.57"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -652,7 +671,7 @@ checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
 [[package]]
 name = "challenge"
 version = "0.1.0"
-source = "git+https://gitcode.com/openeuler/global-trust-authority#95a858d9c98821d71a8cf605542206a6be399215"
+source = "git+https://gitcode.com/openeuler/global-trust-authority#98ad90e81d64fd7c8e6a13bff3516deaeaa9c60d"
 dependencies = [
  "agent_utils",
  "base64 0.22.1",
@@ -751,7 +770,7 @@ dependencies = [
 [[package]]
 name = "config"
 version = "0.1.0"
-source = "git+https://gitcode.com/openeuler/global-trust-authority#95a858d9c98821d71a8cf605542206a6be399215"
+source = "git+https://gitcode.com/openeuler/global-trust-authority#98ad90e81d64fd7c8e6a13bff3516deaeaa9c60d"
 dependencies = [
  "config_manager",
  "cron",
@@ -764,7 +783,7 @@ dependencies = [
 [[package]]
 name = "config_manager"
 version = "0.1.0"
-source = "git+https://gitcode.com/openeuler/global-trust-authority#95a858d9c98821d71a8cf605542206a6be399215"
+source = "git+https://gitcode.com/openeuler/global-trust-authority#98ad90e81d64fd7c8e6a13bff3516deaeaa9c60d"
 dependencies = [
  "pem",
  "serde",
@@ -2467,7 +2486,7 @@ checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 [[package]]
 name = "plugin_manager"
 version = "0.1.0"
-source = "git+https://gitcode.com/openeuler/global-trust-authority#95a858d9c98821d71a8cf605542206a6be399215"
+source = "git+https://gitcode.com/openeuler/global-trust-authority#98ad90e81d64fd7c8e6a13bff3516deaeaa9c60d"
 dependencies = [
  "async-trait",
  "libloading",
@@ -2704,8 +2723,10 @@ dependencies = [
 name = "rbc"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "attestation_client",
  "base64 0.22.1",
+ "cbindgen",
  "josekit",
  "rbs-api-types",
  "reqwest",
@@ -2778,6 +2799,7 @@ name = "rbs-core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "flate2",
  "libc",
  "log",
@@ -3252,6 +3274,15 @@ dependencies = [
  "serde",
  "serde_core",
  "zmij",
+]
+
+[[package]]
+name = "serde_spanned"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6662b5879511e06e8999a8a235d848113e942c9124f211511b16466ee2995f26"
+dependencies = [
+ "serde_core",
 ]
 
 [[package]]
@@ -3910,6 +3941,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "toml"
+version = "0.9.12+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf92845e79fc2e2def6a5d828f0801e29a2f8acc037becc5ab08595c7d5e9863"
+dependencies = [
+ "indexmap",
+ "serde_core",
+ "serde_spanned",
+ "toml_datetime 0.7.5+spec-1.1.0",
+ "toml_parser",
+ "toml_writer",
+ "winnow 0.7.15",
+]
+
+[[package]]
+name = "toml_datetime"
+version = "0.7.5+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "92e1cfed4a3038bc5a127e35a2d360f145e1f4b971b551a2ba5fd7aedf7e1347"
+dependencies = [
+ "serde_core",
+]
+
+[[package]]
 name = "toml_datetime"
 version = "1.1.1+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3925,7 +3980,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b59c4d22ed448339746c59b905d24568fcbb3ab65a500494f7b8c3e97739f2b"
 dependencies = [
  "indexmap",
- "toml_datetime",
+ "toml_datetime 1.1.1+spec-1.1.0",
  "toml_parser",
  "winnow 1.0.1",
 ]
@@ -3940,6 +3995,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "toml_writer"
+version = "1.1.1+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "756daf9b1013ebe47a8776667b466417e2d4c5679d441c26230efd9ef78692db"
+
+[[package]]
 name = "tower-service"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3948,7 +4009,7 @@ checksum = "8df9b6e13f2d32c91b9bd719c00d1958837bc7dec474d94952798cc8e69eeec3"
 [[package]]
 name = "tpm_boot_attester"
 version = "0.1.0"
-source = "git+https://gitcode.com/openeuler/global-trust-authority#95a858d9c98821d71a8cf605542206a6be399215"
+source = "git+https://gitcode.com/openeuler/global-trust-authority#98ad90e81d64fd7c8e6a13bff3516deaeaa9c60d"
 dependencies = [
  "base64 0.22.1",
  "log",
@@ -3963,7 +4024,7 @@ dependencies = [
 [[package]]
 name = "tpm_common_attester"
 version = "0.1.0"
-source = "git+https://gitcode.com/openeuler/global-trust-authority#95a858d9c98821d71a8cf605542206a6be399215"
+source = "git+https://gitcode.com/openeuler/global-trust-authority#98ad90e81d64fd7c8e6a13bff3516deaeaa9c60d"
 dependencies = [
  "base64 0.22.1",
  "hex",
@@ -3977,7 +4038,7 @@ dependencies = [
 [[package]]
 name = "tpm_ima_attester"
 version = "0.1.0"
-source = "git+https://gitcode.com/openeuler/global-trust-authority#95a858d9c98821d71a8cf605542206a6be399215"
+source = "git+https://gitcode.com/openeuler/global-trust-authority#98ad90e81d64fd7c8e6a13bff3516deaeaa9c60d"
 dependencies = [
  "base64 0.22.1",
  "log",
@@ -4735,6 +4796,12 @@ checksum = "1e90edd2ac1aa278a5c4599b1d89cf03074b610800f866d4026dc199d7929a28"
 dependencies = [
  "memchr",
 ]
+
+[[package]]
+name = "winnow"
+version = "0.7.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df79d97927682d2fd8adb29682d1140b343be4ac0f08fd68b7765d9c059d3945"
 
 [[package]]
 name = "winnow"

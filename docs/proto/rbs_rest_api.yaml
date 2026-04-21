@@ -8,7 +8,7 @@ info:
   license:
     name: Mulan Permissive Software License, Version 2
     url: http://license.coscl.org.cn/MulanPSL2
-  version: '0'
+  version: 0.1.0
 servers:
 - url: http://localhost:6666
   description: Default local development (see `rbs.yaml` `rest.listen_addr`)
@@ -45,11 +45,11 @@ components:
         git_hash:
           type: string
           description: Git commit hash at build time (hex), or empty when not embedded at build.
-          example: ''
+          example: 0123456789abcdef0123456789abcdef
         build_date:
           type: string
           description: Build timestamp (UTC), typically RFC 3339, or empty when not embedded at build.
-          example: ''
+          example: 2026-04-20T00:00:00Z
     ErrorBody:
       type: object
       description: Error payload for HTTP error responses (e.g. 500).
@@ -79,6 +79,7 @@ components:
           example: '0'
         build:
           $ref: '#/components/schemas/BuildMetadata'
+          description: Build metadata (`version`, `git_hash`, `build_date`) for this binary; same shape as in the exported `OpenAPI` schema.
 tags:
 - name: System
   description: '`RbsCore::system` — service identity and API/build version via `GET /rbs/version` (system metadata). Does not require authentication.'

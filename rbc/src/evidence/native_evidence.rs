@@ -12,8 +12,9 @@
 
 //! Native evidence provider: collects evidence locally via the attestation_client crate.
 
+use async_trait::async_trait;
 use attestation_client::{AttestationClient, GetEvidenceRequest};
-use rbs_api_types::api::{AttesterData, AuthChallengeResponse};
+use rbs_api_types::{AttesterData, AuthChallengeResponse};
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -46,9 +47,10 @@ impl NativeEvidenceProvider {
     }
 }
 
+#[async_trait]
 impl EvidenceProvider for NativeEvidenceProvider {
     /// Collect local evidence bound to the RBS-issued nonce.
-    fn collect_evidence(
+    async fn collect_evidence(
         &self,
         challenge: &AuthChallengeResponse,
         attester_data: Option<&AttesterData>,
