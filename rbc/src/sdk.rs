@@ -379,6 +379,22 @@ impl Drop for Session {
 }
 
 #[cfg(test)]
+impl Client {
+    /// Construct a `Client` from a pre-built `ClientInner`.
+    pub(crate) fn new_for_test(inner: Rc<ClientInner>) -> Self {
+        Self { inner, _marker: std::marker::PhantomData }
+    }
+}
+
+#[cfg(test)]
+impl Session {
+    /// Return the ephemeral public key as a JWK JSON string.
+    pub(crate) fn test_ephemeral_public_jwk_json(&self) -> Option<String> {
+        self.ephemeral_key.as_ref().and_then(|k| k.public_jwk_json().ok())
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use async_trait::async_trait;
     use super::*;
