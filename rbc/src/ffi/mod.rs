@@ -112,6 +112,7 @@ pub extern "C" fn rbc_buffer_free(buf: *mut u8, len: usize) {
     if !buf.is_null() && len > 0 {
         unsafe {
             let s = slice::from_raw_parts_mut(buf, len);
+            zeroize::Zeroize::zeroize(s);
             drop(Box::from_raw(s as *mut [u8]));
         }
     }

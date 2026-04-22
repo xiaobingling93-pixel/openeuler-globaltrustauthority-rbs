@@ -223,7 +223,13 @@ pub extern "C" fn rbc_session_decrypt_content(
     let session = unsafe { session_ref(session) };
     match session.decrypt_content(jwe_s, pem_opt) {
         Ok(bytes) => {
-            let mut boxed: Box<[u8]> = bytes.into_boxed_slice();
+            // Extract inner Vec without triggering Zeroizing::drop; memory
+            // ownership transfers to C and is released (with zeroing) by RbcBufferFree.
+            let inner: Vec<u8> = unsafe {
+                let mut md = std::mem::ManuallyDrop::new(bytes);
+                std::ptr::read(&mut **md)
+            };
+            let mut boxed: Box<[u8]> = inner.into_boxed_slice();
             let len = boxed.len();
             let ptr = boxed.as_mut_ptr();
             std::mem::forget(boxed);
